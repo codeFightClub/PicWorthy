@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import TagInput from './tagInput.jsx';
 
 export default class UploadForm extends Component {
   checkImgUrl() {
@@ -55,7 +56,17 @@ export default class UploadForm extends Component {
             value={this.props.description}
             onChange={this.props.handleInputChange} 
             style={textareaStyle} />
-        </label><br /><br />
+        </label><br /><br /><br /><br /><br /><br />
+        
+        <div>
+              <TagInput 
+              handleAddition={this.props.handleAddition}
+              handleDelete={this.props.handleDelete}
+              handleDrag={this.props.handleDrag}
+              suggestions={this.props.suggestions}
+              tags={this.props.tags}
+              />
+        </div>
         
         <div style={{textAlign:`center`, position: `relative`, top: `75px`}}>
           <input
@@ -86,4 +97,8 @@ const textareaStyle = {
   resize: `none`,
   contenteditable: `true`,
   borderColor: `#e2e3e5`
+}
+
+const tagInputStyle = {
+
 }
