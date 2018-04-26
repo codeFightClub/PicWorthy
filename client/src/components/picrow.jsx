@@ -12,7 +12,7 @@ const PicRow = ({ pics, rotatePics,showHideDetails, detailedPicURL }) => {
       key={i} 
       showHideDetails={ showHideDetails } 
       picDetails={pic}
-      selected={ pic.imageURL === detailedPicURL }
+      selected={() => pic.imageURL === detailedPicURL }
     />
   ));
 
