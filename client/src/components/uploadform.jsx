@@ -57,6 +57,7 @@ export default class UploadForm extends Component {
             onChange={this.props.handleInputChange} 
             style={textareaStyle} />
         </label><br /><br /><br /><br /><br /><br />
+<<<<<<< HEAD
         
         <div>
               <TagInput 
@@ -67,7 +68,21 @@ export default class UploadForm extends Component {
               tags={this.props.tags}
               />
         </div>
+=======
+>>>>>>> 8bdbe89543271c17810915723e0ac9c12aa979e0
         
+        <label>
+          Tags
+        </label>
+        <TagInput 
+          handleAddition={this.props.handleAddition}
+          handleDelete={this.props.handleDelete}
+          handleDrag={this.props.handleDrag}
+          suggestions={this.props.suggestions}
+          tags={this.props.tags}
+          style={inputStyle}
+        />
+
         <div style={{textAlign:`center`, position: `relative`, top: `75px`}}>
           <input
             name="submit"
