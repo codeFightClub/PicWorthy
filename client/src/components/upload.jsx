@@ -6,6 +6,7 @@ import { Grid, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 import { BeatLoader } from 'react-spinners';
 
+
 /*
  * This top-level component contains the entire upload page, including the map, photo dropzone and
  * upload form subcomponents.
@@ -30,7 +31,16 @@ export default class Upload extends Component {
       submitted: '',
       loading: false,
       latLng: {lat: null, lng: null},
-      uploadStatus: []
+      uploadStatus: [],
+      tags: [
+        { id: "Outdoors", text: "Outdoors"},
+        { id: "TheGreatIndoors", text: "TheGreatIndoors"}
+      ],
+      suggestions: [
+        { id: "Maryland", text: "Maryland"},
+        { id: "California", text: "California"},
+        { id: "Napa", text: "Napa"}
+      ]
     };
 
     /*
@@ -41,6 +51,9 @@ export default class Upload extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.pinLocation = this.pinLocation.bind(this);
+    this.handleAddition = this.handleAddition.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.handleDrag = this.handleDrag.bind(this);
   }
 
   getLink(imgurLink) {
@@ -75,46 +88,44 @@ export default class Upload extends Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    const { category, location, description, imageURL, latLng} = this.state;
-
+    const inputFields = (({category, location, description, imageURL, latLng}) => ({category: category, location: location, description: description, imageURL: imageURL, latLng: latLng, description: description, imageURL: imageURL, latLng: latLng}))(this.state);
     let invalidFields = [];
+
+    for (const pair in inputFields) {
+      pair === 'latLng'
+        ? inputFields[pair].lat === '' || inputFields[pair].lng === '' ? invalidFields.push('Please drop a pin on location on the map') : null
+        : inputFields[pair] === '' ? invalidFields.push(`Please enter a valid ${pair}`) : null;
+    }
     
-    if (category === '') {
-      invalidFields.push('Please enter a category');
-    } 
-    if (location === '') {
-      invalidFields.push('Please enter a location');
-    }
-    if (latLng.lat === null || latLng.lng === null) {
-      invalidFields.push('Please drop pin on location on the map');
-    }
-    if (description === '') {
-      invalidFields.push('Please enter a description');
-    }
-    if (imageURL === '') {
-      invalidFields.push('Please upload a image')
-    }
+    // // if (category === '') {
+    // //   invalidFields.push('Please enter a category');
+    // // } 
+    // // if (location === '') {
+    // //   invalidFields.push('Please enter a location');
+    // // }
+    // // if (latLng.lat === null || latLng.lng === null) {
+    // //   invalidFields.push('Please drop pin on location on the map');
+    // // }
+    // // if (description === '') {
+    // //   invalidFields.push('Please enter a description');
+    // // }
+    // // if (imageURL === '') {
+    // //   invalidFields.push('Please upload a image')
+    // // }
     if (invalidFields.length > 0) {
       this.setState({uploadStatus: invalidFields});
       return;
     } else {
       this.setState({uploadStatus: []})
     }
-
+    inputFields.user_id = this.props.userData._id;
+    inputFields.username = this.props.userData.username;
     
     this.setState({
       loading: true
     })
 
-    axios.post(`/api/upload`, {
-      category,
-      location,
-      imageURL,
-      description,
-      user_id: this.props.userData._id,
-      username: this.props.userData.username,
-      latLng
-    })
+    axios.post(`/api/upload`, inputFields)
     
       .then(res => {
         this.setState({
@@ -148,6 +159,25 @@ export default class Upload extends Component {
       })
   }
 
+  handleAddition (tag) {
+    const { tags } = this.state;
+    this.setState({ tags: [...tags, ...[tag]] })
+  }
+
+  handleDelete (i) {
+    let tags = this.state.tags.filter((tag, index) => index !== i);
+    this.setState({ tags: tags});
+  }
+
+  handleDrag(tag, currentPosition, newPosition) {
+    const tags = [...this.state.tags];
+    const newTags = tags.slice();
+
+    newTags.splice(currentPosition, 1);
+    newTags.splice(newPosition, 0, tag);
+
+    this.setState({ tags: newTags });
+  }
   /*
    * Renders the entire upload page, including the map, the photo upload dropzone and
    * the upload form.
@@ -187,13 +217,17 @@ export default class Upload extends Component {
               handleInputChange={this.handleInputChange}
               handleSubmit={this.handleSubmit}
               uploadStatus={this.state.uploadStatus}
+              handleAddition={this.handleAddition}
+              handleDelete={this.handleDelete}
+              handleDrag={this.handleDrag}
+              suggestions={this.state.suggestions}
+              tags={this.state.tags}
             />
             <br />
             
             <div style={{width: `100px`, margin: `auto`, position: `relative`, top:`80px`}}>
               <BeatLoader color={`#919295`} loading={this.state.loading} />
             </div>
-            
             <div style={{textAlign: `center`, fontWeight: `bold`, fontSize: `large`, position: `relative`, top:`80px`}}>
               {this.state.submitted}
             </div>
