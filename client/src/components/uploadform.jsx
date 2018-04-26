@@ -58,16 +58,18 @@ export default class UploadForm extends Component {
             style={textareaStyle} />
         </label><br /><br /><br /><br /><br /><br />
         
-        <div>
-              <TagInput 
-              handleAddition={this.props.handleAddition}
-              handleDelete={this.props.handleDelete}
-              handleDrag={this.props.handleDrag}
-              suggestions={this.props.suggestions}
-              tags={this.props.tags}
-              />
-        </div>
-        
+        <label>
+          Tags
+        </label>
+        <TagInput 
+          handleAddition={this.props.handleAddition}
+          handleDelete={this.props.handleDelete}
+          handleDrag={this.props.handleDrag}
+          suggestions={this.props.suggestions}
+          tags={this.props.tags}
+          style={inputStyle}
+        />
+
         <div style={{textAlign:`center`, position: `relative`, top: `75px`}}>
           <input
             name="submit"
