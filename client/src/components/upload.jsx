@@ -32,15 +32,15 @@ export default class Upload extends Component {
       loading: false,
       latLng: {lat: null, lng: null},
       uploadStatus: [],
-      tags: [
-        { id: "Outdoors", text: "Outdoors"},
-        { id: "TheGreatIndoors", text: "TheGreatIndoors"}
-      ],
-      suggestions: [
-        { id: "Maryland", text: "Maryland"},
-        { id: "California", text: "California"},
-        { id: "Napa", text: "Napa"}
-      ]
+      tags: ''
+      // tags: [
+      //   { id: "Outdoors", text: "Outdoors"},
+      // ],
+      // suggestions: [
+      //   { id: "Maryland", text: "Maryland"},
+      //   { id: "California", text: "California"},
+      //   { id: "Napa", text: "Napa"}
+      // ]
     };
 
     /*
@@ -120,6 +120,8 @@ export default class Upload extends Component {
     }
     inputFields.user_id = this.props.userData._id;
     inputFields.username = this.props.userData.username;
+    inputFields.tags = this.state.tags.split(', '); //store tags as an array
+    
     
     this.setState({
       loading: true
@@ -143,7 +145,8 @@ export default class Upload extends Component {
           latLng: {
             lat: null,
             lng: null
-          }
+          },
+          tags: '' // reset state of tags
         });
       })
       

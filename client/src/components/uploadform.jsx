@@ -57,31 +57,30 @@ export default class UploadForm extends Component {
             onChange={this.props.handleInputChange} 
             style={textareaStyle} />
         </label><br /><br /><br /><br /><br /><br />
-<<<<<<< HEAD
-        
-        <div>
-              <TagInput 
-              handleAddition={this.props.handleAddition}
-              handleDelete={this.props.handleDelete}
-              handleDrag={this.props.handleDrag}
-              suggestions={this.props.suggestions}
-              tags={this.props.tags}
-              />
-        </div>
-=======
->>>>>>> 8bdbe89543271c17810915723e0ac9c12aa979e0
-        
+{/*         
         <label>
           Tags
-        </label>
-        <TagInput 
+        </label> */}
+        {/* <TagInput 
           handleAddition={this.props.handleAddition}
           handleDelete={this.props.handleDelete}
           handleDrag={this.props.handleDrag}
           suggestions={this.props.suggestions}
           tags={this.props.tags}
           style={inputStyle}
-        />
+        /> */}
+
+        <label>
+          Tags
+          <textarea
+            name="tags"
+            type="text"
+            placeholder="Add tags spaced by commas"
+            value={this.props.tags}
+            onChange={this.props.handleInputChange} 
+            style={textareaStyle} />
+        </label> <br /><br />
+
 
         <div style={{textAlign:`center`, position: `relative`, top: `75px`}}>
           <input

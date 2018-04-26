@@ -56,7 +56,8 @@ db.savePicture = function (data) {
     loc: {
       type: 'Point',
       coordinates: [data.latLng.lng, data.latLng.lat]
-    }
+    },
+    tags: data.tags //store tags associated with picture
   });
 
   return newPic.save();
