@@ -88,45 +88,44 @@ export default class Upload extends Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    const { category, location, description, imageURL, latLng } = this.state;
-
+    const inputFields = (({category, location, description, imageURL, latLng}) => ({category: category, location: location, description: description, imageURL: imageURL, latLng: latLng, description: description, imageURL: imageURL, latLng: latLng}))(this.state);
     let invalidFields = [];
+
+    for (const pair in inputFields) {
+      pair === 'latLng'
+        ? inputFields[pair].lat === '' || inputFields[pair].lng === '' ? invalidFields.push('Please drop a pin on location on the map') : null
+        : inputFields[pair] === '' ? invalidFields.push(`Please enter a valid ${pair}`) : null;
+    }
     
-    if (category === '') {
-      invalidFields.push('Please enter a category');
-    } 
-    if (location === '') {
-      invalidFields.push('Please enter a location');
-    }
-    if (latLng.lat === null || latLng.lng === null) {
-      invalidFields.push('Please drop pin on location on the map');
-    }
-    if (description === '') {
-      invalidFields.push('Please enter a description');
-    }
-    if (imageURL === '') {
-      invalidFields.push('Please upload a image')
-    }
+    // // if (category === '') {
+    // //   invalidFields.push('Please enter a category');
+    // // } 
+    // // if (location === '') {
+    // //   invalidFields.push('Please enter a location');
+    // // }
+    // // if (latLng.lat === null || latLng.lng === null) {
+    // //   invalidFields.push('Please drop pin on location on the map');
+    // // }
+    // // if (description === '') {
+    // //   invalidFields.push('Please enter a description');
+    // // }
+    // // if (imageURL === '') {
+    // //   invalidFields.push('Please upload a image')
+    // // }
     if (invalidFields.length > 0) {
       this.setState({uploadStatus: invalidFields});
       return;
     } else {
       this.setState({uploadStatus: []})
     }
+    inputFields.user_id = this.props.userData._id;
+    inputFields.username = this.props.userData.username;
     
     this.setState({
       loading: true
     })
 
-    axios.post(`/api/upload`, {
-      category,
-      location,
-      imageURL,
-      description,
-      user_id: this.props.userData._id,
-      username: this.props.userData.username,
-      latLng
-    })
+    axios.post(`/api/upload`, inputFields)
     
       .then(res => {
         this.setState({
