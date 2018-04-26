@@ -78,7 +78,7 @@ db.selectClosestPictures = (location) =>
           type: 'Point',
           coordinates: [Number(location.lng), Number(location.lat)]//[lat, lng]
         },
-
+        distanceField: 'distance',
         spherical: true,
         maxDistance: MAX_DISTANCE
       }},
