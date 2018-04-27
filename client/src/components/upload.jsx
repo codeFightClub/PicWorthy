@@ -103,7 +103,7 @@ export default class Upload extends Component {
 
     for (const pair in inputFields) {
       pair === 'latLng'
-        ? inputFields[pair].lat === '' || inputFields[pair].lng === '' ? invalidFields.push('Please drop a pin on location on the map') : null
+        ? inputFields[pair].lat === null || inputFields[pair].lng === null ? invalidFields.push('Your photo does not contain location data. Please drop a location pin on the map') : null
         : inputFields[pair] === '' ? invalidFields.push(`Please enter a valid ${pair}`) : null;
     }
     

@@ -34,35 +34,18 @@ export default class Accept extends React.Component {
 
     //Uses EXIF to parse GPS coordinates from .jpeg images
     EXIF.getData(img[0], function() {
-        let allMetaData = EXIF.getAllTags(this);
-        console.log(allMetaData);
-        let toDecimal = function (number) {
-          return number[0].numerator + number[1].numerator /
-            (60 * number[1].denominator) + number[2].numerator / (3600 * number[2].denominator);
+        let metaTags = EXIF.getAllTags(this);
+
+        let toDecimal = function (meta) {
+          return meta[0].numerator + meta[1].numerator /
+            (60 * meta[1].denominator) + meta[2].numerator / (3600 * meta[2].denominator);
         };
 
-        // let latitude = toDecimal(allMetaData.GPSLatitude);
-        let latitude;
-        let longitude;
+        let lat, lng;
 
-        if (allMetaData.GPSLatitudeRef === 'N') {
-          latitude = toDecimal(allMetaData.GPSLatitude);
-        } else {
-          latitude = toDecimal(allMetaData.GPSLatitude) * -1;
-        }
-
-        if (allMetaData.GPSLongitudeRef === 'E') {
-          longitude = toDecimal(allMetaData.GPSLongitude);
-        } else {
-          longitude = toDecimal(allMetaData.GPSLongitude) * -1;
-        }
-
-        console.log(latitude);
-        console.log(longitude);
-        let latLng = {
-          latitude: latitude,
-          longitude: longitude
-        };
+        lat = metaTags.GPSLatitudeRef === 'N' ? toDecimal(metaTags.GPSLatitude) : toDecimal(metaTags.GPSLatitude) * -1;
+        lng = metaTags.GPSLongitudeRef === 'E' ? toDecimal(metaTags.GPSLongitude) : toDecimal(metaTags.GPSLongitude) * -1;
+        let latLng = { latitude: lat, longitude: lng };
         that.props.setLocation(latLng);     
     });
 
