@@ -35,13 +35,27 @@ export default class Accept extends React.Component {
     //Uses EXIF to parse GPS coordinates from .jpeg images
     EXIF.getData(img[0], function() {
         let allMetaData = EXIF.getAllTags(this);
+        console.log(allMetaData);
         let toDecimal = function (number) {
           return number[0].numerator + number[1].numerator /
             (60 * number[1].denominator) + number[2].numerator / (3600 * number[2].denominator);
         };
 
-        let latitude = toDecimal(allMetaData.GPSLatitude);
-        let longitude = toDecimal(allMetaData.GPSLongitude) * -1;
+        // let latitude = toDecimal(allMetaData.GPSLatitude);
+        let latitude;
+        let longitude;
+
+        if (allMetaData.GPSLatitudeRef === 'N') {
+          latitude = toDecimal(allMetaData.GPSLatitude);
+        } else {
+          latitude = toDecimal(allMetaData.GPSLatitude) * -1;
+        }
+
+        if (allMetaData.GPSLongitudeRef === 'E') {
+          longitude = toDecimal(allMetaData.GPSLongitude);
+        } else {
+          longitude = toDecimal(allMetaData.GPSLongitude) * -1;
+        }
 
         console.log(latitude);
         console.log(longitude);
