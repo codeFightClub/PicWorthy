@@ -51,9 +51,19 @@ export default class Upload extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.pinLocation = this.pinLocation.bind(this);
+    this.setLocation = this.setLocation.bind(this);
     this.handleAddition = this.handleAddition.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
+  }
+
+  setLocation(latLng) {
+    this.setState({
+      latLng: {
+        lat: latLng.latitude,
+        lng: latLng.longitude
+      }
+    });
   }
 
   getLink(imgurLink) {
@@ -208,7 +218,7 @@ export default class Upload extends Component {
           </Col>
           
           <Col xs={6} md={4}>
-            <DropZone getLink={this.getLink} />
+            <DropZone getLink={this.getLink} setLocation={this.setLocation}/>
           </Col>
           
           <Col xs={6} md={4}>

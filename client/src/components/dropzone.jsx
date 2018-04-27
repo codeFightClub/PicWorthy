@@ -4,6 +4,8 @@ import Dropzone from 'react-dropzone';
 import axios from 'axios';
 import { BounceLoader } from 'react-spinners';
 
+import EXIF from 'exif-js';
+
 /*
 This component helps to upload images by providing a 
 'dropzone' area that you can click on or drop items into.
@@ -29,6 +31,27 @@ export default class Accept extends React.Component {
     const formData = new FormData();
     formData.append('image', img[0]);
     const that = this;
+
+    //Uses EXIF to parse GPS coordinates from .jpeg images
+    EXIF.getData(img[0], function() {
+        let allMetaData = EXIF.getAllTags(this);
+        let toDecimal = function (number) {
+          return number[0].numerator + number[1].numerator /
+            (60 * number[1].denominator) + number[2].numerator / (3600 * number[2].denominator);
+        };
+
+        let latitude = toDecimal(allMetaData.GPSLatitude);
+        let longitude = toDecimal(allMetaData.GPSLongitude) * -1;
+
+        console.log(latitude);
+        console.log(longitude);
+        let latLng = {
+          latitude: latitude,
+          longitude: longitude
+        };
+        that.props.setLocation(latLng);     
+    });
+
 
     this.setState({
       loading: true
