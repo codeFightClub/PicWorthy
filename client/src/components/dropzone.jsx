@@ -29,47 +29,55 @@ export default class Accept extends React.Component {
 
   onDrop(img) {
     const formData = new FormData();
-    formData.append('image', img[0]);
+    let dataArr = [];
     const that = this;
 
-    //Uses EXIF to parse GPS coordinates from .jpeg images
-    EXIF.getData(img[0], function() {
-        let metaTags = EXIF.getAllTags(this);
-
-        let toDecimal = function (meta) {
-          return meta[0].numerator + meta[1].numerator /
-            (60 * meta[1].denominator) + meta[2].numerator / (3600 * meta[2].denominator);
-        };
-
-        let lat, lng;
-
-        lat = metaTags.GPSLatitudeRef === 'N' ? toDecimal(metaTags.GPSLatitude) : toDecimal(metaTags.GPSLatitude) * -1;
-        lng = metaTags.GPSLongitudeRef === 'E' ? toDecimal(metaTags.GPSLongitude) : toDecimal(metaTags.GPSLongitude) * -1;
-        let latLng = { latitude: lat, longitude: lng };
-        that.props.setLocation(latLng);     
-    });
-
+    let toDecimal = function (meta) {
+      return meta[0].numerator + meta[1].numerator /
+        (60 * meta[1].denominator) + meta[2].numerator / (3600 * meta[2].denominator);
+    };
+  
+    for (let i = 0; i < img.length; i++) {
+      dataArr[i] = new FormData();
+      dataArr[i].append('image', img[i]);
+      //Uses EXIF to parse GPS coordinates from .jpeg images
+      EXIF.getData(img[i], function() {
+          let metaTags = EXIF.getAllTags(this);
+  
+          let lat, lng;
+  
+          lat = metaTags.GPSLatitudeRef === 'N' ? toDecimal(metaTags.GPSLatitude) : toDecimal(metaTags.GPSLatitude) * -1;
+          lng = metaTags.GPSLongitudeRef === 'E' ? toDecimal(metaTags.GPSLongitude) : toDecimal(metaTags.GPSLongitude) * -1;
+          let latLng = { lat: lat, lng: lng };
+          that.props.setLocation(latLng);     
+      });
+    }
 
     this.setState({
       loading: true
     })
 
-    axios({
+    dataArr.forEach((form) => {
+      axios({
         method: 'post',
         url: 'https://api.imgur.com/3/image',
         headers: {Authorization: "Client-ID 3f9b22888755abe"},
-        data: formData
-    })
-    .then(function(response) {
-      that.props.getLink(response.data.data.link);
-      that.setState({
-        uploaded: true,
-        loading: false
+        data: form
+      })
+      .then(function(response) {
+        console.log(response);
+        that.props.getLink(response.data.data.link);
+      })
+      .catch(function(err) {
+        console.log(err);
       })
     })
-    .catch(function(err) {
-        console.log(err);
+
+    this.setState({
+      uploaded: true,
+      loading: false
     })
+
   }
 
   changeImg() {

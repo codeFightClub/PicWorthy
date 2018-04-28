@@ -24,13 +24,17 @@ export default class Upload extends Component {
     this.state = {
       category: '',
       location: '',
-      imageURL: '',
+      imageURLS: [],
       description: '',
       user_id: '',
       username: '',
       submitted: '',
       loading: false,
-      latLng: {lat: null, lng: null},
+      coords: {
+        lat: null,
+        lng: null
+      },
+      latLng: [],
       uploadStatus: [],
       tags: ''
       // tags: [
@@ -58,22 +62,23 @@ export default class Upload extends Component {
   }
 
   setLocation(latLng) {
+    let copy = this.state.latLng.slice();
+    copy.push(latLng)
     this.setState({
-      latLng: {
-        lat: latLng.latitude,
-        lng: latLng.longitude
-      }
+      latLng: copy
     });
   }
 
   getLink(imgurLink) {
-    this.setState({ imageURL: imgurLink })
+    let copy = this.state.imageURLS.slice();
+    copy.push(imgurLink);
+    this.setState({ imageURLS: copy })
   }
 
   pinLocation({ latLng }) {
     
     this.setState({
-      latLng: {
+      coords: {
         lat: latLng.lat(),
         lng: latLng.lng(),
       }
@@ -98,46 +103,45 @@ export default class Upload extends Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    const inputFields = (({category, location, description, imageURL, latLng}) => ({category: category, location: location, description: description, imageURL: imageURL, latLng: latLng, description: description, imageURL: imageURL, latLng: latLng}))(this.state);
+    let photos = [];
+
+    for (let i = 0; i < this.state.imageURLS.length; i++) {
+      let photo = {
+        category: this.state.category,
+        location: this.state.location,
+        description: this.state.description,
+        imageURL: this.state.imageURLS[i],
+        latLng: this.state.latLng[i] || this.state.coords
+      }
+      photo.user_id = this.props.userData._id;
+      photo.username = this.props.userData.username;
+      photo.tags = this.state.tags.split(', ');
+      photos.push(photo);
+    }
+
+    console.log(photos);
+
     let invalidFields = [];
 
-    for (const pair in inputFields) {
-      pair === 'latLng'
-        ? inputFields[pair].lat === null || inputFields[pair].lng === null ? invalidFields.push('Your photo does not contain location data. Please drop a location pin on the map') : null
-        : inputFields[pair] === '' ? invalidFields.push(`Please enter a valid ${pair}`) : null;
-    }
+    photos.forEach((photo) => {
+      photo.latLng.latitude === null || photo.latLng.longitude === null ? invalidFields.push('Your photo does not contain location data. Please drop a location pin on the map') : null;
+      photo.category === '' ? invalidFields.push(`Please enter a valid category`) : null;
+      photo.location === '' ? invalidFields.push(`Please enter a valid location`) : null;
+      photo.description === '' ? invalidFields.push(`Please enter a valid description`) : null;
+    });
     
-    // // if (category === '') {
-    // //   invalidFields.push('Please enter a category');
-    // // } 
-    // // if (location === '') {
-    // //   invalidFields.push('Please enter a location');
-    // // }
-    // // if (latLng.lat === null || latLng.lng === null) {
-    // //   invalidFields.push('Please drop pin on location on the map');
-    // // }
-    // // if (description === '') {
-    // //   invalidFields.push('Please enter a description');
-    // // }
-    // // if (imageURL === '') {
-    // //   invalidFields.push('Please upload a image')
-    // // }
     if (invalidFields.length > 0) {
       this.setState({uploadStatus: invalidFields});
       return;
     } else {
       this.setState({uploadStatus: []})
     }
-    inputFields.user_id = this.props.userData._id;
-    inputFields.username = this.props.userData.username;
-    inputFields.tags = this.state.tags.split(', '); //store tags as an array
-    
     
     this.setState({
       loading: true
     })
 
-    axios.post(`/api/upload`, inputFields)
+    axios.post(`/api/upload`, photos)
     
       .then(res => {
         this.setState({
@@ -150,13 +154,11 @@ export default class Upload extends Component {
         this.setState({
           category: '',
           description: '',
-          imageURL: '',
+          imageURLS: [],
           location: '',
-          latLng: {
-            lat: null,
-            lng: null
-          },
-          tags: '' // reset state of tags
+          latLng: [],
+          tags: '', // reset state of tags
+          coords: {lat: null, lng: null}
         });
       })
       
@@ -197,7 +199,7 @@ export default class Upload extends Component {
    */
 
   render() {
-    const { lat, lng } = this.state.latLng;
+    const { lat, lng } = this.state.coords;
     const marker = [lat, lng].includes(null) 
       ? [] 
       : [{lat, lng}]
