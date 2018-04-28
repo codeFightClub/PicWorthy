@@ -48,6 +48,12 @@ get.user = (req, res) => {
   }
 }
 
+post.user = (req, res) => {
+  
+  db.updateUser(req.body.username, req.body.tags).then(() => res.end());
+
+}
+
 post.upload = (req, res) => {
   Promise.map(req.body, (picture) => {
     console.log(picture);

@@ -102,7 +102,7 @@ db.findTag = (obj) => {
   }});
 }
 
-db.getSuggestions = (username, tags) =>
+db.updateUser = (username, tags) =>
    models.Users.findOneAndUpdate({username: username}, {$set: {tags: tags}}, function(err, res) {
     if (err) { console.error(err) }
     console.log(res);
