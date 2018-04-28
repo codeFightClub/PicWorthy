@@ -55,7 +55,7 @@ export default class UploadForm extends Component {
             value={this.props.description}
             onChange={this.props.handleInputChange} 
             />
-        </label>
+        </label> <br /><br /><br /><br /><br /><br />
 
         <label>
           Tags

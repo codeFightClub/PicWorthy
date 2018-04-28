@@ -45,6 +45,7 @@
     "mongoose-geojson-schema": "^2.1.2",
     "morgan": "^1.9.0",
     "node-googleplaces": "^0.1.2",
+    "nodemon": "^1.17.3",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "passport-session": "^1.0.2",

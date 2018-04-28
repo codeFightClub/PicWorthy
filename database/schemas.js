@@ -6,7 +6,8 @@ const UserSchema = mongoose.Schema({
   username: String,
   password: String,
   photos: [{}],
-  likes: [{}]
+  likes: [{}],
+  tags: {} // shows the weighted tags 
 });
 
 const PictureSchema = new mongoose.Schema({

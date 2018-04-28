@@ -48,7 +48,8 @@ export default class App extends Component {
 
     axios.get('/api/user')
       .then((result) => 
-        this.setState({userData: result.data}));
+        this.setState({userData: result.data})
+      )
   }
   
   navbarHandleClose() {
@@ -116,8 +117,8 @@ export default class App extends Component {
             render={(props) => {
               return (
                 <Locations 
-                  userPromise={ userPromise }
-                  userData={ userData }
+                  userPromise={ this.state.userPromise }
+                  userData={ this.state.userData }
                   pathname={ props.location.pathname }
                 />
               )

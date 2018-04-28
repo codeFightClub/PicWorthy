@@ -110,6 +110,12 @@ export default class Upload extends Component {
       loading: true
     })
 
+    let body = this.state.tags.split(', ').reduce((acc, tag) => {
+      acc.tags[tag] = 1;
+    }, {username: '', tags: {}});
+  
+    axios.post(`/api/user`, body).then(() => console.log('this is actually working very well'))
+
     axios.post(`/api/upload`, photos)
     
       .then(res => {
@@ -173,8 +179,8 @@ export default class Upload extends Component {
     return (
       <div>
         
-        <div>
-          <div> 
+        
+          <Col xs={9} md={4} style={{height: `400px`}}> 
             <Worthymap 
               getLocationUpload={this.getLocationUpload}
               onMapClick={this.pinLocation}
@@ -182,7 +188,7 @@ export default class Upload extends Component {
               defaultCenter={{lat: 37.77, lng: -122.41}}
               markers={ marker }
             />
-          </div>
+          </Col>
           
 
           <Col xs={6} md={4}>
@@ -214,7 +220,6 @@ export default class Upload extends Component {
             </div>
           </div>
         </div>
-      </div>
     )
   }
 }

@@ -48,6 +48,12 @@ get.user = (req, res) => {
   }
 }
 
+post.user = (req, res) => {
+  
+  db.updateUser(req.body.username, req.body.tags).then(() => res.end());
+
+}
+
 post.upload = (req, res) => {
   Promise.map(req.body, (picture) => {
     console.log(picture);
@@ -93,6 +99,20 @@ post.favorites = function(req, res) {
     })
 }
 
+ get.suggestions = function(req, res) {
+  db.fetchUser(req.user.username).then((profile) => 
+    profile.photos.reduce((acc, photo) => {
+      photo.tags.forEach((tag) => 
+      acc.tags[tag] ? acc.tags[tag]++ : acc.tags[tag] = 1)
+      return acc;
+    }, {user: req.user.username, tags: {}})
+  ).then(({user, tags}) => 
+  db.getSuggestions(user, tags)
+  .then((data) => res.status(200).json(data))
+  .catch((err) => console.error(err)));
+}
+
+let inc = {$set: {golf: 1, tannerSmells: 1}};
   
 
 module.exports.get = get;
