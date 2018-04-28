@@ -6,21 +6,9 @@ import { Grid, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 import { BeatLoader } from 'react-spinners';
 
-
-/*
- * This top-level component contains the entire upload page, including the map, photo dropzone and
- * upload form subcomponents.
- * 
- * We keep track of the information that the user wants to upload in this component's state, and
- * bind all the methods tracking the state to this component, so that we can add that information 
- * within other components.
- */
-
 export default class Upload extends Component {
   constructor(props) {
-    
     super(props)
-    
     this.state = {
       category: '',
       location: '',
@@ -33,20 +21,7 @@ export default class Upload extends Component {
       latLng: {lat: null, lng: null},
       uploadStatus: [],
       tags: ''
-      // tags: [
-      //   { id: "Outdoors", text: "Outdoors"},
-      // ],
-      // suggestions: [
-      //   { id: "Maryland", text: "Maryland"},
-      //   { id: "California", text: "California"},
-      //   { id: "Napa", text: "Napa"}
-      // ]
     };
-
-    /*
-     * Bind and define methods that track the state change of this component within other components.
-     */
-
     this.getLink = this.getLink.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -61,7 +36,6 @@ export default class Upload extends Component {
   }
 
   pinLocation({ latLng }) {
-    
     this.setState({
       latLng: {
         lat: latLng.lat(),
@@ -80,11 +54,6 @@ export default class Upload extends Component {
     });
   }
 
-  /*
-   * Method checks whether any fields are empty, and then if all required information is present,
-   * submits post request using axios.
-   */
-
   handleSubmit(event) {
     event.preventDefault();
 
@@ -97,21 +66,6 @@ export default class Upload extends Component {
         : inputFields[pair] === '' ? invalidFields.push(`Please enter a valid ${pair}`) : null;
     }
     
-    // // if (category === '') {
-    // //   invalidFields.push('Please enter a category');
-    // // } 
-    // // if (location === '') {
-    // //   invalidFields.push('Please enter a location');
-    // // }
-    // // if (latLng.lat === null || latLng.lng === null) {
-    // //   invalidFields.push('Please drop pin on location on the map');
-    // // }
-    // // if (description === '') {
-    // //   invalidFields.push('Please enter a description');
-    // // }
-    // // if (imageURL === '') {
-    // //   invalidFields.push('Please upload a image')
-    // // }
     if (invalidFields.length > 0) {
       this.setState({uploadStatus: invalidFields});
       return;
@@ -181,10 +135,6 @@ export default class Upload extends Component {
 
     this.setState({ tags: newTags });
   }
-  /*
-   * Renders the entire upload page, including the map, the photo upload dropzone and
-   * the upload form.
-   */
 
   render() {
     const { lat, lng } = this.state.latLng;
@@ -194,10 +144,10 @@ export default class Upload extends Component {
     
     
     return (
-      <Grid style={{minHeight: `calc(100vh - 130px)`}}>
+      <div>
         
-        <Row style={{padding: `50px`}}>
-          <Col xs={9} md={4} style={{height: `400px`}}> 
+        <div>
+          <div> 
             <Worthymap 
               getLocationUpload={this.getLocationUpload}
               onMapClick={this.pinLocation}
@@ -205,13 +155,13 @@ export default class Upload extends Component {
               defaultCenter={{lat: 37.77, lng: -122.41}}
               markers={ marker }
             />
-          </Col>
+          </div>
           
-          <Col xs={6} md={4}>
+          <div>
             <DropZone getLink={this.getLink} />
-          </Col>
+          </div>
           
-          <Col xs={6} md={4}>
+          <div>
             <UploadForm
               category={this.state.category}
               location={this.state.location}
@@ -228,15 +178,15 @@ export default class Upload extends Component {
             />
             <br />
             
-            <div style={{width: `100px`, margin: `auto`, position: `relative`, top:`80px`}}>
-              <BeatLoader color={`#919295`} loading={this.state.loading} />
+            <div>
+              <BeatLoader />
             </div>
-            <div style={{textAlign: `center`, fontWeight: `bold`, fontSize: `large`, position: `relative`, top:`80px`}}>
+            <div>
               {this.state.submitted}
             </div>
-          </Col>
-        </Row>
-      </Grid>
+          </div>
+        </div>
+      </div>
     )
   }
 }
