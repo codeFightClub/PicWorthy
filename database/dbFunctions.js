@@ -38,7 +38,7 @@ db.saveUser = (obj) => {
         )
     }) 
     
-  } else {
+    } else {
       return false;
     }
   })

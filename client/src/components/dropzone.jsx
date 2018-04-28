@@ -4,6 +4,10 @@ import Dropzone from 'react-dropzone';
 import axios from 'axios';
 import { BounceLoader } from 'react-spinners';
 
+import EXIF from 'exif-js';
+import Promise from 'bluebird';
+import $ from 'jquery';
+
 /*
 This component helps to upload images by providing a 
 'dropzone' area that you can click on or drop items into.
@@ -27,28 +31,69 @@ export default class Accept extends React.Component {
 
   onDrop(img) {
     const formData = new FormData();
-    formData.append('image', img[0]);
+    let dataArr = [];
     const that = this;
 
+    let toDecimal = function (meta) {
+      return meta[0].numerator + meta[1].numerator /
+        (60 * meta[1].denominator) + meta[2].numerator / (3600 * meta[2].denominator);
+    };
+  
+    for (let i = 0; i < img.length; i++) {
+      dataArr[i] = new FormData();
+      dataArr[i].append('image', img[i]);
+      //Uses EXIF to parse GPS coordinates from .jpeg images
+      EXIF.getData(img[i], function() {
+          let metaTags = EXIF.getAllTags(this);
+  
+          let lat, lng;
+  
+          lat = metaTags.GPSLatitudeRef === 'N' ? toDecimal(metaTags.GPSLatitude) : toDecimal(metaTags.GPSLatitude) * -1;
+          lng = metaTags.GPSLongitudeRef === 'E' ? toDecimal(metaTags.GPSLongitude) : toDecimal(metaTags.GPSLongitude) * -1;
+          let latLng = { lat: lat, lng: lng };
+          that.props.setLocation(latLng);     
+      });
+    }
+
     this.setState({
-      loading: true
+      loading: true,
+      uploaded: false
     })
 
-    axios({
+    // dataArr.forEach((form) => {
+    //   axios({
+    //     method: 'post',
+    //     url: 'https://api.imgur.com/3/image',
+    //     headers: {Authorization: "Client-ID 3f9b22888755abe"},
+    //     data: form
+    //   })
+    //   .then(function(response) {
+    //     console.log(response);
+    //     that.props.getLink(response.data.data.link);
+    //   })
+    //   .catch(function(err) {
+    //     console.log(err);
+    //   })
+    // })
+
+    Promise.map(dataArr, (form) => {
+      return axios({
         method: 'post',
         url: 'https://api.imgur.com/3/image',
         headers: {Authorization: "Client-ID 3f9b22888755abe"},
-        data: formData
-    })
-    .then(function(response) {
-      that.props.getLink(response.data.data.link);
-      that.setState({
-        uploaded: true,
-        loading: false
+        data: form
       })
-    })
-    .catch(function(err) {
-        console.log(err);
+      .then((response) => {
+        console.log(response);
+        that.props.getLink(response.data.data.link);
+      }).catch((err) => {
+        console.log('this is your err message');
+      })
+    }).then(() => {
+      that.setState({
+        loading: false,
+        uploaded: true
+      })
     })
   }
 
