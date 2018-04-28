@@ -38,6 +38,7 @@
     "history": "^4.7.2",
     "imgur": "^0.2.1",
     "imgur-uploader": "^4.2.1",
+    "jquery": "^3.3.1",
     "lodash": "^4.17.5",
     "mongodb-memory-server": "^1.7.3",
     "mongoose": "^5.0.14",

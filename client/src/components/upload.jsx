@@ -121,20 +121,20 @@ export default class Upload extends Component {
 
     console.log(photos);
 
-    let invalidFields = [];
+    let invalidFields = new Set();
 
     photos.forEach((photo) => {
-      photo.latLng.latitude === null || photo.latLng.longitude === null ? invalidFields.push('Your photo does not contain location data. Please drop a location pin on the map') : null;
-      photo.category === '' ? invalidFields.push(`Please enter a valid category`) : null;
-      photo.location === '' ? invalidFields.push(`Please enter a valid location`) : null;
-      photo.description === '' ? invalidFields.push(`Please enter a valid description`) : null;
+      photo.latLng.lat === null || photo.latLng.lng === null ? invalidFields.add('Your photo does not contain location data. Please drop a location pin on the map') : null;
+      photo.category === '' ? invalidFields.add(`Please enter a valid category`) : null;
+      photo.location === '' ? invalidFields.add(`Please enter a valid location`) : null;
+      photo.description === '' ? invalidFields.add(`Please enter a valid description`) : null;
     });
     
-    if (invalidFields.length > 0) {
-      this.setState({uploadStatus: invalidFields});
+    if (invalidFields.size > 0) {
+      this.setState({uploadStatus: Array.from(invalidFields)});
       return;
     } else {
-      this.setState({uploadStatus: []})
+      this.setState({uploadStatus: Array.from(invalidFields)});
     }
     
     this.setState({

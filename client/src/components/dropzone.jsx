@@ -5,6 +5,8 @@ import axios from 'axios';
 import { BounceLoader } from 'react-spinners';
 
 import EXIF from 'exif-js';
+import Promise from 'bluebird';
+import $ from 'jquery';
 
 /*
 This component helps to upload images by providing a 
@@ -54,30 +56,45 @@ export default class Accept extends React.Component {
     }
 
     this.setState({
-      loading: true
+      loading: true,
+      uploaded: false
     })
 
-    dataArr.forEach((form) => {
-      axios({
+    // dataArr.forEach((form) => {
+    //   axios({
+    //     method: 'post',
+    //     url: 'https://api.imgur.com/3/image',
+    //     headers: {Authorization: "Client-ID 3f9b22888755abe"},
+    //     data: form
+    //   })
+    //   .then(function(response) {
+    //     console.log(response);
+    //     that.props.getLink(response.data.data.link);
+    //   })
+    //   .catch(function(err) {
+    //     console.log(err);
+    //   })
+    // })
+
+    Promise.map(dataArr, (form) => {
+      return axios({
         method: 'post',
         url: 'https://api.imgur.com/3/image',
         headers: {Authorization: "Client-ID 3f9b22888755abe"},
         data: form
       })
-      .then(function(response) {
+      .then((response) => {
         console.log(response);
         that.props.getLink(response.data.data.link);
+      }).catch((err) => {
+        console.log('this is your err message');
       })
-      .catch(function(err) {
-        console.log(err);
+    }).then(() => {
+      that.setState({
+        loading: false,
+        uploaded: true
       })
     })
-
-    this.setState({
-      uploaded: true,
-      loading: false
-    })
-
   }
 
   changeImg() {
