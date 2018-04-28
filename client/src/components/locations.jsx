@@ -8,6 +8,7 @@ import PicRow from './picrow.jsx';
 import Details from './details.jsx';
 import fetchClosestPics from '../helpers/fetchClosestPics.jsx';
 import getUserLocation from '../helpers/getUserLocation.jsx';
+import Suggestions from './suggestions.jsx';
 
 /*
  * The locations, userpage, and likes page all get rendered with the locations component
@@ -146,7 +147,7 @@ export default class Locations extends Component {
       zoom: 4,
       position: {lat: 37.09, lng: -95.71},
       detailedPicURL: 'NONE',
-      userData: props.userData
+      userData: this.props.userData
     };
     /*
      * this is a hacky way to get the userid to work.  We had major issues passing data
@@ -156,8 +157,12 @@ export default class Locations extends Component {
      * can be extracted out of the promise that got passed as a prop.
      */
     
-    if (props.userData.user_id === '') {
-      props.userPromise.then((result) => this.setState({userData: result.data}));
+    if (this.props.userData.user_id === '') {
+      
+      this.props.userPromise.then((result) => {
+        console.log('this is the result of the promise', result.data);
+        this.setState({userData: result.data})
+      });
     }
 
     this.updatePictures = _.throttle(this.updatePictures.bind(this), 1000);
@@ -317,7 +322,9 @@ export default class Locations extends Component {
 
     return (
       <Grid style={{margin: `0`, width: `100vw`, paddingLeft: `0px`, paddingRight: `0px`, minHeight: `calc(100vh - 150px)`}}>
-        
+      
+      <Suggestions userData={this.state.userData}/>
+      
         <Row style={{margin: `20px`, height:`calc((100vh - 150px)/2)`, minHeight: `400px`}}>
         
         <WorthyMap

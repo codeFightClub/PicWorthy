@@ -15,4 +15,6 @@ router.get('/api/closestPics', controller.get.closestPics);
 
 router.post('/api/favorites', controller.post.favorites);
 
+router.get('/api/suggestions', controller.get.suggestions);
+
 module.exports = router;

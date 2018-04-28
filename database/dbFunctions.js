@@ -45,7 +45,6 @@ db.saveUser = (obj) => {
 };
 
 db.savePicture = function (data) {
-
   const newPic = new models.Pictures({
     category: data.category,
     location: data.location,
@@ -59,15 +58,15 @@ db.savePicture = function (data) {
     },
     tags: data.tags //store tags associated with picture
   });
-
+  
   return newPic.save();
 };
 
-db.savePictureToUser = (data) =>
+db.savePictureToUser = (data) => 
   models.Users.update(
     {_id: data.user_id},
     {$push: { photos: data}}
-  );
+)
 
 const MAX_DISTANCE = 20000000;
 
@@ -94,4 +93,19 @@ db.addToFavorites = (data) =>
     {$push: { likes: data}}
   );
 
-module.exports = db;
+db.findTag = (obj) => {
+  db.fetchUser(obj.username)
+  .then((user) => user.tags)
+  .then((tags) => {
+    for (key in tags) {
+      tags[key] === Math.max(Object.values(tags)) ? key : null;
+  }});
+}
+
+db.getSuggestions = (username, tags) =>
+   models.Users.findOneAndUpdate({username: username}, {$set: {tags: tags}}, function(err, res) {
+    if (err) { console.error(err) }
+    console.log(res);
+});
+
+module.exports = db
