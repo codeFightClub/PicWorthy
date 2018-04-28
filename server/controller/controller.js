@@ -1,5 +1,6 @@
 const db = require ('../../database/dbFunctions.js');
 const passport = require('../middleware/passport.js');
+const Promise = require('bluebird');
 
 const post = {};
 const get = {};
@@ -47,14 +48,33 @@ get.user = (req, res) => {
   }
 }
 
-post.upload = (req, res) => 
-  db.savePicture(req.body)
-    .then((data) => db.savePictureToUser(req.body))
-    .then(() => res.end())
+post.upload = (req, res) => {
+  Promise.map(req.body, (picture) => {
+    console.log(picture);
+    return db.savePicture(picture)
+    .then(() => {
+      db.savePictureToUser(picture)
+    })
     .catch((err) => {
       console.log('error uploading photo', err);
-      res.status(500).send('error uploading photo')
-    });
+      res.status(500).send('error uploading photo');
+    })
+  })
+  .then(() => res.end())
+  .catch((err) => {
+    console.log('error uploading photos', err);
+    res.status(500).send('error uploading photos');
+  })
+}
+
+// post.upload = (req, res) => 
+//   db.savePicture(req.body)
+//     .then(() => db.savePictureToUser(req.body))
+//     .then(() => res.end())
+//     .catch((err) => {
+//       console.log('error uploading photo', err);
+//       res.status(500).send('error uploading photo')
+//     });
 
 get.closestPics = function(req, res) {
   db.selectClosestPictures({lat: req.query.lat, lng: req.query.lng})

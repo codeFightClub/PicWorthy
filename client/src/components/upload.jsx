@@ -6,64 +6,53 @@ import { Grid, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 import { BeatLoader } from 'react-spinners';
 
-
-/*
- * This top-level component contains the entire upload page, including the map, photo dropzone and
- * upload form subcomponents.
- * 
- * We keep track of the information that the user wants to upload in this component's state, and
- * bind all the methods tracking the state to this component, so that we can add that information 
- * within other components.
- */
-
 export default class Upload extends Component {
   constructor(props) {
-    
     super(props)
-    
     this.state = {
       category: '',
       location: '',
-      imageURL: '',
+      imageURLS: [],
       description: '',
       user_id: '',
       username: '',
       submitted: '',
       loading: false,
-      latLng: {lat: null, lng: null},
+      coords: {
+        lat: null,
+        lng: null
+      },
+      latLng: [],
       uploadStatus: [],
       tags: ''
-      // tags: [
-      //   { id: "Outdoors", text: "Outdoors"},
-      // ],
-      // suggestions: [
-      //   { id: "Maryland", text: "Maryland"},
-      //   { id: "California", text: "California"},
-      //   { id: "Napa", text: "Napa"}
-      // ]
     };
-
-    /*
-     * Bind and define methods that track the state change of this component within other components.
-     */
-
     this.getLink = this.getLink.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.pinLocation = this.pinLocation.bind(this);
+    this.setLocation = this.setLocation.bind(this);
     this.handleAddition = this.handleAddition.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
   }
 
+  setLocation(latLng) {
+    let copy = this.state.latLng.slice();
+    copy.push(latLng)
+    this.setState({
+      latLng: copy
+    });
+  }
+
   getLink(imgurLink) {
-    this.setState({ imageURL: imgurLink })
+    let copy = this.state.imageURLS.slice();
+    copy.push(imgurLink);
+    this.setState({ imageURLS: copy })
   }
 
   pinLocation({ latLng }) {
-    
     this.setState({
-      latLng: {
+      coords: {
         lat: latLng.lat(),
         lng: latLng.lng(),
       }
@@ -80,54 +69,48 @@ export default class Upload extends Component {
     });
   }
 
-  /*
-   * Method checks whether any fields are empty, and then if all required information is present,
-   * submits post request using axios.
-   */
-
   handleSubmit(event) {
     event.preventDefault();
 
-    const inputFields = (({category, location, description, imageURL, latLng}) => ({category: category, location: location, description: description, imageURL: imageURL, latLng: latLng, description: description, imageURL: imageURL, latLng: latLng}))(this.state);
-    let invalidFields = [];
+    let photos = [];
 
-    for (const pair in inputFields) {
-      pair === 'latLng'
-        ? inputFields[pair].lat === '' || inputFields[pair].lng === '' ? invalidFields.push('Please drop a pin on location on the map') : null
-        : inputFields[pair] === '' ? invalidFields.push(`Please enter a valid ${pair}`) : null;
+    for (let i = 0; i < this.state.imageURLS.length; i++) {
+      let photo = {
+        category: this.state.category,
+        location: this.state.location,
+        description: this.state.description,
+        imageURL: this.state.imageURLS[i],
+        latLng: this.state.latLng[i] || this.state.coords
+      }
+      photo.user_id = this.props.userData._id;
+      photo.username = this.props.userData.username;
+      photo.tags = this.state.tags.split(', ');
+      photos.push(photo);
     }
+
+    console.log(photos);
+
+    let invalidFields = new Set();
+
+    photos.forEach((photo) => {
+      photo.latLng.lat === null || photo.latLng.lng === null ? invalidFields.add('Your photo does not contain location data. Please drop a location pin on the map') : null;
+      photo.category === '' ? invalidFields.add(`Please enter a valid category`) : null;
+      photo.location === '' ? invalidFields.add(`Please enter a valid location`) : null;
+      photo.description === '' ? invalidFields.add(`Please enter a valid description`) : null;
+    });
     
-    // // if (category === '') {
-    // //   invalidFields.push('Please enter a category');
-    // // } 
-    // // if (location === '') {
-    // //   invalidFields.push('Please enter a location');
-    // // }
-    // // if (latLng.lat === null || latLng.lng === null) {
-    // //   invalidFields.push('Please drop pin on location on the map');
-    // // }
-    // // if (description === '') {
-    // //   invalidFields.push('Please enter a description');
-    // // }
-    // // if (imageURL === '') {
-    // //   invalidFields.push('Please upload a image')
-    // // }
-    if (invalidFields.length > 0) {
-      this.setState({uploadStatus: invalidFields});
+    if (invalidFields.size > 0) {
+      this.setState({uploadStatus: Array.from(invalidFields)});
       return;
     } else {
-      this.setState({uploadStatus: []})
+      this.setState({uploadStatus: Array.from(invalidFields)});
     }
-    inputFields.user_id = this.props.userData._id;
-    inputFields.username = this.props.userData.username;
-    inputFields.tags = this.state.tags.split(', '); //store tags as an array
-    
     
     this.setState({
       loading: true
     })
 
-    axios.post(`/api/upload`, inputFields)
+    axios.post(`/api/upload`, photos)
     
       .then(res => {
         this.setState({
@@ -140,13 +123,11 @@ export default class Upload extends Component {
         this.setState({
           category: '',
           description: '',
-          imageURL: '',
+          imageURLS: [],
           location: '',
-          latLng: {
-            lat: null,
-            lng: null
-          },
-          tags: '' // reset state of tags
+          latLng: [],
+          tags: '', // reset state of tags
+          coords: {lat: null, lng: null}
         });
       })
       
@@ -181,23 +162,19 @@ export default class Upload extends Component {
 
     this.setState({ tags: newTags });
   }
-  /*
-   * Renders the entire upload page, including the map, the photo upload dropzone and
-   * the upload form.
-   */
 
   render() {
-    const { lat, lng } = this.state.latLng;
+    const { lat, lng } = this.state.coords;
     const marker = [lat, lng].includes(null) 
       ? [] 
       : [{lat, lng}]
     
     
     return (
-      <Grid style={{minHeight: `calc(100vh - 130px)`}}>
+      <div>
         
-        <Row style={{padding: `50px`}}>
-          <Col xs={9} md={4} style={{height: `400px`}}> 
+        <div>
+          <div> 
             <Worthymap 
               getLocationUpload={this.getLocationUpload}
               onMapClick={this.pinLocation}
@@ -205,13 +182,14 @@ export default class Upload extends Component {
               defaultCenter={{lat: 37.77, lng: -122.41}}
               markers={ marker }
             />
+          </div>
+          
+
+          <Col xs={6} md={4}>
+            <DropZone getLink={this.getLink} setLocation={this.setLocation}/>
           </Col>
           
-          <Col xs={6} md={4}>
-            <DropZone getLink={this.getLink} />
-          </Col>
-          
-          <Col xs={6} md={4}>
+          <div>
             <UploadForm
               category={this.state.category}
               location={this.state.location}
@@ -228,15 +206,15 @@ export default class Upload extends Component {
             />
             <br />
             
-            <div style={{width: `100px`, margin: `auto`, position: `relative`, top:`80px`}}>
-              <BeatLoader color={`#919295`} loading={this.state.loading} />
+            <div>
+              <BeatLoader />
             </div>
-            <div style={{textAlign: `center`, fontWeight: `bold`, fontSize: `large`, position: `relative`, top:`80px`}}>
+            <div>
               {this.state.submitted}
             </div>
-          </Col>
-        </Row>
-      </Grid>
+          </div>
+        </div>
+      </div>
     )
   }
 }
