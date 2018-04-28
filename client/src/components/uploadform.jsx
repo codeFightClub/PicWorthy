@@ -5,24 +5,23 @@ import TagInput from './tagInput.jsx';
 export default class UploadForm extends Component {
   checkImgUrl() {
     if(this.props.imageURL) {
-      return <p style={{fontWeight:`bold`}}>Image attached.</p>
+      return <p>Image attached.</p>
     
     } else {
-      return <p style={{fontWeight:`bold`}}>First, find your place on the map.<br></br> Next, upload an image of your place.</p>
+      return ( <div><p>First, find your place on the map.</p> 
+               <p>Next, upload an image of your place.</p></div> )
     }
   }
   
   render() {
-    
     const uploadStatus = this.props.uploadStatus.map((status) => <div>{status}</div>);
-
     return (
-      <div style={{paddingTop: `30px`}}>
+      <div >
         {this.checkImgUrl()}
       
       <br />
       
-      <div style={{color: 'red', fontWeight: 'bold'}}>{uploadStatus}</div>
+      <div>{uploadStatus}</div>
       <form onSubmit={this.props.handleSubmit}>
         
         <label>
@@ -33,8 +32,8 @@ export default class UploadForm extends Component {
             placeholder="Enter the type of place"
             value={this.props.category}
             onChange={this.props.handleInputChange}
-            style={inputStyle} />
-        </label><br /><br />
+            />
+        </label>
         
         <label>
           Place
@@ -44,8 +43,8 @@ export default class UploadForm extends Component {
             placeholder="Enter the place's name"
             value={this.props.location}
             onChange={this.props.handleInputChange}
-            style={inputStyle} />
-        </label><br /><br />
+            />
+        </label>
         
         <label>
           Description
@@ -55,20 +54,8 @@ export default class UploadForm extends Component {
             placeholder="Describe what's special about this place"
             value={this.props.description}
             onChange={this.props.handleInputChange} 
-            style={textareaStyle} />
-        </label><br /><br /><br /><br /><br /><br />
-{/*         
-        <label>
-          Tags
-        </label> */}
-        {/* <TagInput 
-          handleAddition={this.props.handleAddition}
-          handleDelete={this.props.handleDelete}
-          handleDrag={this.props.handleDrag}
-          suggestions={this.props.suggestions}
-          tags={this.props.tags}
-          style={inputStyle}
-        /> */}
+            />
+        </label>
 
         <label>
           Tags
@@ -78,41 +65,17 @@ export default class UploadForm extends Component {
             placeholder="Add tags spaced by commas"
             value={this.props.tags}
             onChange={this.props.handleInputChange} 
-            style={textareaStyle} />
-        </label> <br /><br />
+            />
+        </label> 
 
-
-        <div style={{textAlign:`center`, position: `relative`, top: `75px`}}>
+        <div>
           <input
             name="submit"
             type="submit" 
-            style={{borderRadius:`5px`}}
           />
         </div>
       </form>
       </div>
     );
   }
-}
-
-const inputStyle = {
-  position: `absolute`,
-  left: `105px`,
-  width: `calc(100% - 105px)`,
-  fontWeight: `normal`,
-}
-
-const textareaStyle = {
-  position: `absolute`,
-  left: `105px`,
-  width: `calc(100% - 105px)`,
-  height: `100px`,
-  fontWeight: `normal`,
-  resize: `none`,
-  contenteditable: `true`,
-  borderColor: `#e2e3e5`
-}
-
-const tagInputStyle = {
-
 }
