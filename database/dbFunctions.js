@@ -93,19 +93,21 @@ db.addToFavorites = (data) =>
     {$push: { likes: data}}
   );
 
-db.findTag = (obj) => {
-  db.fetchUser(obj.username)
-  .then((user) => user.tags)
-  .then((tags) => {
-    for (key in tags) {
-      tags[key] === Math.max(Object.values(tags)) ? key : null;
-  }});
-}
-
 db.updateUser = (username, tags) =>
    models.Users.findOneAndUpdate({username: username}, {$set: {tags: tags}}, function(err, res) {
     if (err) { console.error(err) }
     console.log(res);
 });
+
+db.getSuggestions = (tag) => 
+  models.Users.find().then(users => 
+   users.data.reduce((acc, user) => {
+     user.photos.reduce((acc, photo) => {
+        photo.tags.includes(tag) ? acc.push(photo) : null;
+        return acc;
+      }, []).concat(acc)
+      return acc; 
+   }, [])
+  )
 
 module.exports = db
