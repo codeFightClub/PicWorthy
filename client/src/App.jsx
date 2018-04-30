@@ -25,7 +25,8 @@ export default class App extends Component {
         username: '',
         user_id: '',
         likes: [],
-        photos: []
+        photos: [],
+        tags: {}
       },
 
       showLogin: false,
@@ -47,9 +48,10 @@ export default class App extends Component {
     this.navbarHandleShowLogin = this.navbarHandleShowLogin.bind(this);
 
     axios.get('/api/user')
-      .then((result) => 
+      .then((result) => {
+        console.log(this.state)
         this.setState({userData: result.data})
-      )
+      })
   }
   
   navbarHandleClose() {

@@ -59,7 +59,9 @@ db.savePicture = function (data) {
     tags: data.tags //store tags associated with picture
   });
   
-  return newPic.save();
+  return newPic.save().then(data => {console.log(data)})
+  
+
 };
 
 db.savePictureToUser = (data) => 
@@ -93,19 +95,18 @@ db.addToFavorites = (data) =>
     {$push: { likes: data}}
   );
 
-db.findTag = (obj) => {
-  db.fetchUser(obj.username)
-  .then((user) => user.tags)
-  .then((tags) => {
-    for (key in tags) {
-      tags[key] === Math.max(Object.values(tags)) ? key : null;
-  }});
-}
-
 db.updateUser = (username, tags) =>
    models.Users.findOneAndUpdate({username: username}, {$set: {tags: tags}}, function(err, res) {
-    if (err) { console.error(err) }
+    if (err) { throw err }
     console.log(res);
 });
+
+db.getSuggestions = (tag, username) => 
+  models.Pictures.find().then(pictures => 
+    pictures.filter(picture => 
+      picture.tags.indexOf(tag) !== -1 && picture.username !== username
+    )
+  )
+  
 
 module.exports = db
