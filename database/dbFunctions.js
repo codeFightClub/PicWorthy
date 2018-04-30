@@ -59,7 +59,9 @@ db.savePicture = function (data) {
     tags: data.tags //store tags associated with picture
   });
   
-  return newPic.save();
+  return newPic.save().then(data => {console.log(data)})
+  
+
 };
 
 db.savePictureToUser = (data) => 
@@ -95,19 +97,16 @@ db.addToFavorites = (data) =>
 
 db.updateUser = (username, tags) =>
    models.Users.findOneAndUpdate({username: username}, {$set: {tags: tags}}, function(err, res) {
-    if (err) { console.error(err) }
+    if (err) { throw err }
     console.log(res);
 });
 
-db.getSuggestions = (tag) => 
-  models.Users.find().then(users => 
-   users.data.reduce((acc, user) => {
-     user.photos.reduce((acc, photo) => {
-        photo.tags.includes(tag) ? acc.push(photo) : null;
-        return acc;
-      }, []).concat(acc)
-      return acc; 
-   }, [])
+db.getSuggestions = (tag, username) => 
+  models.Pictures.find().then(pictures => 
+    pictures.filter(picture => 
+      picture.tags.indexOf(tag) !== -1 && picture.username !== username
+    )
   )
+  
 
 module.exports = db

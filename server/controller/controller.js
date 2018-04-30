@@ -48,14 +48,10 @@ get.user = (req, res) => {
   }
 }
 
-
 post.upload = (req, res) => {
   Promise.map(req.body.photos, (picture) => {
-    console.log(picture);
     return db.savePicture(picture)
-    .then(() => {
-      db.savePictureToUser(picture)
-    })
+    .then(() => db.savePictureToUser(picture))
     .then(() => db.updateUser(req.body.username, req.body.tags))
     .catch((err) => {
       console.log('error uploading photo', err);
@@ -96,28 +92,23 @@ post.favorites = function(req, res) {
 }
 
 get.suggestions = function(req, res) {
-  // let tags = Object.keys(req.user.tags);
-  // let possibleHeaviestTags = Object.values(req.user.tags).reduce((acc, tagVal, index) => {
-  //   if (tagVal > acc.weight) {
-  //     acc.tags = [];
-  //     acc.weight = tagVal;
-  //   } 
-  //   if (tagVal === acc.weight) {
-  //     acc.tags.push(tags[index]);
-  //   }
-  //   return acc;
-  // }, {tags: [], weight: -Infinity}).tags;
-  // let heaviestWeightedTag = possibleHeaviestTags[Math.floor(Math.random() * Math.floor(possibleHeaviestTags.length))]
+  let tags = Object.keys(req.user.tags);
+  let possibleHeaviestTags = Object.values(req.user.tags).reduce((acc, tagVal, index) => {
+    if (tagVal > acc.weight) {
+      acc.tags = [];
+      acc.weight = tagVal;
+    } 
+    if (tagVal === acc.weight) {
+      acc.tags.push(tags[index]);
+    }
+    return acc;
+  }, {tags: [], weight: 0}).tags;
+  let heaviestWeightedTag = possibleHeaviestTags[Math.floor(Math.random() * Math.floor(possibleHeaviestTags.length))]
   
-  // db.getSuggestions(heaviestWeightedTag)
-  // .then((data) => res.status(200).json(data))
-  // .catch((err) => console.error(err));
-  res.status(200);
-  res.end();
+  db.getSuggestions(heaviestWeightedTag, req.user.username)
+  .then((data) => res.status(200).json(data))
+  .catch((err) => { throw err });
 }
-
-let inc = {$set: {golf: 1, tannerSmells: 1}};
-  
 
 module.exports.get = get;
 module.exports.post = post;

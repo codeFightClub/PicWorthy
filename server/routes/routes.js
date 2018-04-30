@@ -9,8 +9,6 @@ router.get('/api/logout', controller.get.logout);
 
 router.get('/api/user', controller.get.user);
 
-router.post('/api/user', controller.post.user);
-
 router.post('/api/upload', controller.post.upload);
 
 router.get('/api/closestPics', controller.get.closestPics);

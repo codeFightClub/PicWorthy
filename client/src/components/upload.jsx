@@ -84,7 +84,7 @@ export default class Upload extends Component {
       }
       photo.user_id = this.props.userData._id;
       photo.username = this.props.userData.username;
-      photo.tags = this.state.tags.split(', ');
+      photo.tags = this.state.tags.toLowerCase().split(', ');
       photos.push(photo);
     }
 
@@ -110,13 +110,15 @@ export default class Upload extends Component {
       loading: true
     })
 
-    let body = this.state.tags.split(', ').reduce((acc, tag) => {
-      acc.tags[tag] = 1;
-    }, {username: '', tags: {}});
-  
-    axios.post(`/api/user`, body).then(() => console.log('this is actually working very well'))
+    const body = this.state.tags.split(', ').reduce((acc, tag) => {
+      this.props.userData.tags ? acc.tags : acc.tags = {};
+      acc.tags[tag] ? acc.tags[tag]++ : acc.tags[tag] = 1;
+      return acc;
+    }, {username: this.props.userData.username, tags: this.props.userData.tags});
 
-    axios.post(`/api/upload`, photos)
+    body.photos = photos;
+
+    axios.post(`/api/upload`, body)
     
       .then(res => {
         this.setState({

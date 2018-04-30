@@ -25,9 +25,9 @@ const PictureSchema = new mongoose.Schema({
     coordinates: {
       type: [Number],
       index: '2dsphere'
-    },
-    tags: [String] // store tags in array 
-  }
+    }
+  },
+  tags: [String] // store tags in array 
 });
 
 module.exports.UserSchema = UserSchema;
